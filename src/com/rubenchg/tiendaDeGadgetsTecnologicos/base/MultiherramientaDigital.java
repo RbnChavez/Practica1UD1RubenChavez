@@ -5,8 +5,6 @@ import java.time.LocalDate;
 public class MultiherramientaDigital extends Gadget {
     private int autonomiaHoras;
     private boolean tieneNFC;
-    private boolean tieneInfrarrojos;
-    private boolean tieneRadioSubGHz;
 
 
     public MultiherramientaDigital() {
@@ -14,14 +12,11 @@ public class MultiherramientaDigital extends Gadget {
     }
 
     public MultiherramientaDigital(String codigo, String nombre, String marca,
-                                   double precio, int stock, LocalDate fechaAlta,
-                                   String descripcion, int autonomiaHoras, boolean tieneNFC,
-                                   boolean tieneInfrarrojos, boolean tieneRadioSubGHz) {
-        super(codigo, nombre, marca, precio, stock, fechaAlta, descripcion);
+                                   double precio, LocalDate fechaAlta,
+                                   String descripcion, int autonomiaHoras, boolean tieneNFC) {
+        super(codigo, nombre, marca, precio, fechaAlta, descripcion);
         this.autonomiaHoras = autonomiaHoras;
         this.tieneNFC = tieneNFC;
-        this.tieneInfrarrojos = tieneInfrarrojos;
-        this.tieneRadioSubGHz = tieneRadioSubGHz;
     }
 
     public int getAutonomiaHoras() {
@@ -40,29 +35,8 @@ public class MultiherramientaDigital extends Gadget {
         this.tieneNFC = tieneNFC;
     }
 
-    public boolean isTieneInfrarrojos() {
-        return tieneInfrarrojos;
-    }
-
-    public void setTieneInfrarrojos(boolean tieneInfrarrojos) {
-        this.tieneInfrarrojos = tieneInfrarrojos;
-    }
-
-    public boolean isTieneRadioSubGHz() {
-        return tieneRadioSubGHz;
-    }
-
-    public void setTieneRadioSubGHz(boolean tieneRadioSubGHz) {
-        this.tieneRadioSubGHz = tieneRadioSubGHz;
-    }
-
     @Override
     public String toString() {
-        return "MultiherramientaDigital{" +
-                "autonomiaHoras=" + autonomiaHoras +
-                ", tieneNFC=" + tieneNFC +
-                ", tieneInfrarrojos=" + tieneInfrarrojos +
-                ", tieneRadioSubGHz=" + tieneRadioSubGHz +
-                "} " + super.toString();
+        return "Multiherramienta digital: " + super.toString();
     }
 }

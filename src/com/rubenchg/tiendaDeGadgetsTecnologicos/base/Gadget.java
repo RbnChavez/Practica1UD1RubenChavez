@@ -7,7 +7,6 @@ public abstract class Gadget {
     private String nombre;
     private String marca;
     private double precio;
-    private int stock;
     private LocalDate fechaAlta;
     private String descripcion;
 
@@ -15,12 +14,11 @@ public abstract class Gadget {
     public Gadget() {
     }
 
-    public Gadget(String codigo, String nombre, String marca, double precio, int stock, LocalDate fechaAlta, String descripcion) {
+    public Gadget(String codigo, String nombre, String marca, double precio, LocalDate fechaAlta, String descripcion) {
         this.codigo = codigo;
         this.nombre = nombre;
         this.marca = marca;
         this.precio = precio;
-        this.stock = stock;
         this.fechaAlta = fechaAlta;
         this.descripcion = descripcion;
     }
@@ -57,14 +55,6 @@ public abstract class Gadget {
         this.precio = precio;
     }
 
-    public int getStock() {
-        return stock;
-    }
-
-    public void setStock(int stock) {
-        this.stock = stock;
-    }
-
     public LocalDate getFechaAlta() {
         return fechaAlta;
     }
@@ -83,14 +73,6 @@ public abstract class Gadget {
 
     @Override
     public String toString() {
-        return "Gadget{" +
-                "codigo='" + codigo + '\'' +
-                ", nombre='" + nombre + '\'' +
-                ", marca='" + marca + '\'' +
-                ", precio=" + precio +
-                ", stock=" + stock +
-                ", fechaAlta=" + fechaAlta +
-                ", descripcion='" + descripcion + '\'' +
-                '}';
+        return getCodigo() + " " + getMarca() + " " + getNombre();
     }
 }
