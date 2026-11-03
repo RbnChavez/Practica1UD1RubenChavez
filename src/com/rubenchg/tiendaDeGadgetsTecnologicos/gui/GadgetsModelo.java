@@ -1,10 +1,8 @@
 package com.rubenchg.tiendaDeGadgetsTecnologicos.gui;
 
 import com.rubenchg.tiendaDeGadgetsTecnologicos.base.*;
-import org.w3c.dom.DOMImplementation;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Text;
+import org.xml.sax.SAXException;
+import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -16,10 +14,14 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import javax.xml.transform.TransformerException;
 
+/**
+ * Gestiona la lista de gadgets y su importación y exportación XML.
+ */
 public class GadgetsModelo {
     private ArrayList<Gadget> listaGadgets = new ArrayList<>();
 
@@ -27,6 +29,7 @@ public class GadgetsModelo {
         return listaGadgets;
     }
 
+    /** Comprueba si ya hay un artículo con ese código. */
     public boolean existeCodigo(String codigo){
         for (Gadget gadget : listaGadgets) {
             if (gadget.getCodigo().equals(codigo)){
@@ -37,42 +40,42 @@ public class GadgetsModelo {
         return false;
     }
 
-    public void altaTecladoSplit(String codigo, String nombre, String marca,
-                                 double precio, LocalDate fechaAlta,
+    /** Elimina de la lista el artículo indicado. */
+    public boolean eliminarGadget(Gadget gadget) {
+        return listaGadgets.remove(gadget);
+    }
+
+    /** Añade un teclado split a la lista. */
+    public void altaTecladoSplit(String codigo, String nombre, String marca, double precio, LocalDate fechaAlta,
                                  String descripcion, int numeroTeclas, String tipoSwitch){
-        TecladoSplit nuevoTeclado = new TecladoSplit(
-                codigo, nombre, marca, precio, fechaAlta, descripcion,
-                numeroTeclas, tipoSwitch);
+        TecladoSplit nuevoTeclado = new TecladoSplit(codigo, nombre, marca, precio, fechaAlta, descripcion, numeroTeclas, tipoSwitch);
         listaGadgets.add(nuevoTeclado);
     }
 
-    public void altaPlacaRaspberry(String codigo, String nombre, String marca,
-                                   double precio, LocalDate fechaAlta,
+    /** Añade una placa Raspberry a la lista. */
+    public void altaPlacaRaspberry(String codigo, String nombre, String marca, double precio, LocalDate fechaAlta,
                                    String descripcion, int ramGB, int numeroPuertosUSB) {
-         listaGadgets.add(new PlacaRaspberry(
-                codigo, nombre, marca, precio, fechaAlta, descripcion,
-                ramGB, numeroPuertosUSB));
+         listaGadgets.add(new PlacaRaspberry(codigo, nombre, marca, precio, fechaAlta, descripcion, ramGB, numeroPuertosUSB));
     }
 
-    public void altaMultiherramienta(String codigo, String nombre, String marca,
-                                     double precio, LocalDate fechaAlta,
+    /** Añade una multiherramienta digital a la lista. */
+    public void altaMultiherramienta(String codigo, String nombre, String marca, double precio, LocalDate fechaAlta,
                                      String descripcion, int autonomiaHoras, boolean tieneNFC){
-        listaGadgets.add(new MultiherramientaDigital(
-                codigo, nombre, marca, precio, fechaAlta, descripcion,
-                autonomiaHoras, tieneNFC));
+        listaGadgets.add(new MultiherramientaDigital(codigo, nombre, marca, precio, fechaAlta, descripcion, autonomiaHoras, tieneNFC));
     }
+    /** Guarda los artículos en el archivo XML indicado. */
     public void exportar(File fichero) throws ParserConfigurationException, TransformerException{
-        //Preparar herramientas XML
+        // Prepara las herramientas para crear el documento XML.
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
-        //Documento
+        // Crea el documento en memoria con <xml> como raíz.
         DOMImplementation dom = builder.getDOMImplementation();
         Document documento = dom.createDocument(null, "xml", null);
-        //elemento Raiz
+        // Añade <Gadgets> dentro de la raíz <xml>.
         Element raiz = documento.createElement("Gadgets");
         documento.getDocumentElement().appendChild(raiz);
 
-        // elementos nodo
+        // Recorre los artículos y crea sus etiquetas XML.
         for (Gadget gadget : listaGadgets) {
             Element nodoGadget = null;
 
@@ -150,11 +153,75 @@ public class GadgetsModelo {
                 nodoDatos.appendChild(texto);
             }
         }
+        // Origen: los datos que se van a leer,  documento XML en memoria.
+        // Source es una interfaz (tipo general), DOMSource es una clase que la implementa.
+        // Simil con herencia: Gadget articulo = new TecladoSplit();
         Source source = new DOMSource(documento);
+
+        // Destino: el File indica en qué archivo se escribirá el XML.
+        // Result es una interfaz (tipo general), StreamResult es la clase concreta del destino.
         Result resultado = new StreamResult(fichero);
 
+        // newInstance() obtiene la fábrica; newTransformer() obtiene la herramienta.
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
+
+        // Aquí se escribe el documento en el archivo: se crea o se sobrescribe.
+        // Va fuera del for para guardar el árbol completo con todos los gadgets.
         transformer.transform(source, resultado);
+    }
+    /** Lee el XML y sustituye la lista de artículos. */
+    public void importarXML(File fichero) throws ParserConfigurationException, IOException, SAXException{
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        // Lee el archivo XML y carga su árbol en memoria.
+        Document documento = builder.parse(fichero);
+
+        // La importación sustituye la lista anterior.
+        listaGadgets = new ArrayList<>();
+
+        // Recoge las etiquetas del XML, sin los nodos de texto.
+        NodeList listaElementos = documento.getElementsByTagName("*");
+        for (int i = 0; i < listaElementos.getLength(); i++) {
+            // item(i) devuelve un Node, se utiliza como Element.
+            Element nodoGadget = (Element) listaElementos.item(i);
+            Gadget nuevoGadget = null;
+
+            // Reconoce el tipo de artículo y rellena sus campos propios.
+            if (nodoGadget.getTagName().equals("TecladoSplit")) {
+                TecladoSplit nuevoTeclado = new TecladoSplit();
+                // Busca numeroTeclas, lee su texto y lo convierte en un entero.
+                nuevoTeclado.setNumeroTeclas(Integer.parseInt(nodoGadget.getElementsByTagName("numeroTeclas").item(0).getTextContent()));
+                nuevoTeclado.setTipoSwitch(nodoGadget.getElementsByTagName("tipoSwitch").item(0).getTextContent());
+                // Las dos variables apuntan al mismo teclado.
+                nuevoGadget = nuevoTeclado;
+
+            } else if (nodoGadget.getTagName().equals("PlacaRaspberry")) {
+                PlacaRaspberry nuevaPlaca = new PlacaRaspberry();
+                nuevaPlaca.setRamGB(Integer.parseInt(nodoGadget.getElementsByTagName("ramGB").item(0).getTextContent()));
+                nuevaPlaca.setNumeroPuertosUSB(Integer.parseInt(nodoGadget.getElementsByTagName("numeroPuertosUSB").item(0).getTextContent()));
+                nuevoGadget = nuevaPlaca;
+
+            } else if (nodoGadget.getTagName().equals("MultiherramientaDigital")) {
+                MultiherramientaDigital nuevaMultiherramienta = new MultiherramientaDigital();
+                nuevaMultiherramienta.setAutonomiaHoras(Integer.parseInt(nodoGadget.getElementsByTagName("autonomiaHoras").item(0).getTextContent()));
+                nuevaMultiherramienta.setTieneNFC(nodoGadget.getElementsByTagName("tieneNFC").item(0).getTextContent().equals("true"));
+                nuevoGadget = nuevaMultiherramienta;
+            }
+
+            // Los artículos reciben los campos comunes.
+            if (nuevoGadget != null) {
+                nuevoGadget.setCodigo(nodoGadget.getElementsByTagName("codigo").item(0).getTextContent());
+                nuevoGadget.setNombre(nodoGadget.getElementsByTagName("nombre").item(0).getTextContent());
+                nuevoGadget.setMarca(nodoGadget.getElementsByTagName("marca").item(0).getTextContent());
+                nuevoGadget.setPrecio(Double.parseDouble(nodoGadget.getElementsByTagName("precio").item(0).getTextContent()));
+                nuevoGadget.setFechaAlta(LocalDate.parse(nodoGadget.getElementsByTagName("fechaAlta").item(0).getTextContent()));
+                nuevoGadget.setDescripcion(nodoGadget.getElementsByTagName("descripcion").item(0).getTextContent());
+
+                // Añade el artículo completo a la lista de la aplicación.
+                listaGadgets.add(nuevoGadget);
+            }
+        }
+
     }
 
 }

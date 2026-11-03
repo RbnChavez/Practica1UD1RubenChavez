@@ -2,6 +2,9 @@ package com.rubenchg.tiendaDeGadgetsTecnologicos.base;
 
 import java.time.LocalDate;
 
+/**
+ * Representa una multiherramienta digital con autonomía y NFC.
+ */
 public class MultiherramientaDigital extends Gadget {
     private int autonomiaHoras;
     private boolean tieneNFC;
@@ -11,9 +14,7 @@ public class MultiherramientaDigital extends Gadget {
         super();
     }
 
-    public MultiherramientaDigital(String codigo, String nombre, String marca,
-                                   double precio, LocalDate fechaAlta,
-                                   String descripcion, int autonomiaHoras, boolean tieneNFC) {
+    public MultiherramientaDigital(String codigo, String nombre, String marca, double precio, LocalDate fechaAlta, String descripcion, int autonomiaHoras, boolean tieneNFC) {
         super(codigo, nombre, marca, precio, fechaAlta, descripcion);
         this.autonomiaHoras = autonomiaHoras;
         this.tieneNFC = tieneNFC;

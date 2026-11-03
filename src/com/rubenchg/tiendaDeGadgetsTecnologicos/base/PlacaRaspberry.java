@@ -2,6 +2,9 @@ package com.rubenchg.tiendaDeGadgetsTecnologicos.base;
 
 import java.time.LocalDate;
 
+/**
+ * Representa una placa Raspberry con su memoria RAM y puertos USB.
+ */
 public class PlacaRaspberry extends Gadget {
     private int ramGB;
     private int numeroPuertosUSB;
@@ -10,9 +13,7 @@ public class PlacaRaspberry extends Gadget {
         super();
     }
 
-    public PlacaRaspberry(String codigo, String nombre, String marca,
-                          double precio, LocalDate fechaAlta,
-                          String descripcion, int ramGB, int numeroPuertosUSB) {
+    public PlacaRaspberry(String codigo, String nombre, String marca, double precio, LocalDate fechaAlta, String descripcion, int ramGB, int numeroPuertosUSB) {
         super(codigo, nombre, marca, precio, fechaAlta, descripcion);
         this.ramGB = ramGB;
         this.numeroPuertosUSB = numeroPuertosUSB;

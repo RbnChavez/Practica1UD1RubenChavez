@@ -2,6 +2,9 @@ package com.rubenchg.tiendaDeGadgetsTecnologicos.base;
 
 import java.time.LocalDate;
 
+/**
+ * Define los datos comunes de los gadgets de la tienda.
+ */
 public abstract class Gadget {
     private String codigo;
     private String nombre;
